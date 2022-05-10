@@ -1,11 +1,8 @@
-from datetime import date, datetime, timedelta
-import socket
+import os, threading, time, psutil, socket
 from tkinter import messagebox
 from tkinter import *
-import os
-import threading
-import time
-import psutil
+from util.log import *
+from datetime import timedelta 
 
 # store IP Address in use
 ip_addr = ""
@@ -22,29 +19,6 @@ def get_ip_address():
     global ip_addr
     ip_addr = s.getsockname()[0]
     return s.getsockname()[0]
-
-# func: get_12time
-# args: none
-# desc: return the 12 hour formatted time with afternoon/morning
-def get_12time():
-    time = datetime.now()
-    time = time.strftime("%I:%M:%S %p")
-    return time
-
-# func: get_date
-# args: none
-# desc: return the 12 hour formatted time with afternoon/morning
-def get_date():
-    local_date = date.today().strftime("%b-%d-%Y")
-    return local_date
-
-# func: log
-# args: string or integer concat
-# desc: Writes to console in log format. Utilizes print to enable output > text
-def log(string):
-    #print(get_12time() + " - " + string);
-    with open(os.path.join('./logs/',get_date()+".txt"), "a") as the_file:
-        the_file.write(get_12time() + " - " + string  + "\n")
 
     ##with open(os.path('./logs/'),(get_date()+".txt"), 'a') as the_file:
     ##    the_file.write(get_12time() + " - " + string  + "\n")
@@ -69,9 +43,9 @@ def exit_on_click():
     global clock_thread
     exit_status = TRUE
     time.sleep(1)
-    window.destroy()
     clock_thread.join()
     batt_thread.join()
+    window.destroy()
     log("Closing Application\n\n")
     exit()
 
@@ -79,15 +53,8 @@ def exit_on_click():
 # args: none
 # desc: update clock element
 def set_stime():
-    
-    #implement check for lunch and for off work
-    
-    if("01:55" in get_12time()):
-        clock.config(text = get_12time() + "\nLunch Time\n", foreground="red")
-    elif("04:00" in get_12time()):
-        clock.config(text = get_12time() + "\nTime to leave\n", foreground="#000fff000")
-    else:
-        clock.config(text = get_12time(), foreground="white")
+
+    clock.config(text = get_12time(), foreground="white")
 
 
 # func: update_bat_stats
@@ -122,7 +89,7 @@ def update_time():
     try:
         while(True):
             global exit_status
-            #print(exit_status)
+            #log.log(exit_status)
             
             if(exit_status):
                 log("Clock Thread Closed")
@@ -194,13 +161,13 @@ clock_thread.start()
 #check if on a network
 if(check_connectivity()):
     log("Connected to: " + str(ip_addr))
+    #set title to IP
+    window.title(str(os.getlogin())+"@"+ip_addr)
 else: # Exit here on Error
     log("Failed to verify network connection")
     messagebox.showerror('Connection Error', 'A network connection is required to run this applicaiton. Please connect to a network and try again.')
-    exit()
-
-#set title to IP
-window.title(str(os.getlogin())+"@"+ip_addr)
+    #set title to User
+    window.title(str(os.getlogin())+"@Offline")
 
 #network check cleared and IPv4 Saved for use in sensor ports. 
 
