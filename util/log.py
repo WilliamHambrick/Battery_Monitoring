@@ -18,9 +18,8 @@ def get_date():
 
 # func: log
 # args: string or integer concat
-# desc: Writes to console in log format. Utilizes log.log to enable output > text
+# desc: Writes to console in log format. Utilizes log to enable output > text
 def log(string):
-    #log.log(get_12time() + " - " + string);
-    print(get_12time() + " - " + string  + "\n")
+    print(get_12time() + " - " + str(string));
     with open(os.path.join('./logs/',get_date()+".txt"), "a") as the_file:
-        the_file.write(get_12time() + " - " + string  + "\n")
+        the_file.write(get_12time() + " - " + str(string) + "\n")
